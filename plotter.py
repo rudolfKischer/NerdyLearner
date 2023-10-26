@@ -24,7 +24,8 @@ class PointPlot():
                  points = None, 
                  color=(1.0, 0.0, 0.0), 
                  point_size=0.02,
-                 line_width=1, 
+                 line_width=1,
+                 show_points=True, 
                  connect=True):
         self.points = points
         if self.points is None:
@@ -33,6 +34,7 @@ class PointPlot():
         self.point_size = point_size
         self.connect = connect
         self.line_width = line_width
+        self.show_points = show_points
     
     def add_point(self, x, y):
         self.points.append((x, y))
@@ -46,8 +48,9 @@ class PointPlot():
             self.add_point(*point)
     
     def draw(self):
-        for point in self.points:
-            draw_pointRound(point, self.color, self.point_size)
+        if self.show_points:
+            for point in self.points:
+                draw_pointRound(point, self.color, self.point_size)
         
         if self.connect:
             for i in range(len(self.points) - 1):
@@ -75,10 +78,10 @@ class FunctionPlotter():
         self.segments = segments
         self.color = color
         self.grid = GridVisualizer(x_range, y_range)
-        self.pointPlot = PointPlot([], color, 0.01, True)
+        self.pointPlot = PointPlot([], color=self.color, point_size=0.01, line_width=1, connect=True, show_points=False)
 
     
-    def get_seg_points(self, x_range, y_range):
+    def get_seg_points(self, x_range):
         seg_points = []
         for seg in range(self.segments):
             x = x_range[0] + seg * (x_range[1] - x_range[0]) / self.segments
@@ -86,14 +89,14 @@ class FunctionPlotter():
             seg_points.append((x, y))
         return seg_points
 
-    def plot_fn(self, fn, x_range, y_range):
-        seg_points = self.get_seg_points(x_range, y_range)
+    def plot_fn(self):
+        seg_points = self.get_seg_points(self.x_range)
         self.pointPlot.set_points(seg_points)
         self.pointPlot.draw()
     
     def draw(self):
         self.grid.draw()
-        self.plot_fn(self.fn, self.x_range, self.y_range)
+        self.plot_fn()
     
 
     
