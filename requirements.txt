@@ -1,2 +1,3 @@
 PyOpenGL
 glfw
+Pillow==9.5.0

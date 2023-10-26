@@ -1,6 +1,7 @@
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from grid_visualizer import GridVisualizer
 
 class LinePlot():
 
@@ -25,6 +26,7 @@ class PointPlot():
 
     def plot_point(self):
         glBegin(GL_LINE_STRIP)
+        glColor3f(1.0, 1.0, 1.0)
         for x, y in self.points:
             glVertex2f(x, y)
         glEnd()
@@ -37,35 +39,38 @@ class PointPlot():
             y = y / window_size[1] * 2 - 1
             self.add_point(x, -y)
 
-class GridVisualizer():
+class FunctionPlotter():
     
-    def __init__(self, num_rows=10, num_cols=10, color = (0.3, 0.3, 0.4)):
-        self.num_rows = num_rows
-        self.num_cols = num_cols
+    def __init__(self, fn, x_range=None, y_range=None, segments=100, color=(1.0, 0.0, 0.0)):
+        self.fn = fn
+        self.x_range = x_range
+        self.y_range = y_range
+        if self.x_range is None:
+            self.x_range = (-10, 10)
+        if self.y_range is None:
+            self.y_range = (-10, 10)
+        self.segments = segments
         self.color = color
-        self.axis_color = (1.0, 1.0, 1.0)
-        self.line_thickness = 1
-    
-    def plot_grid(self):
+        self.grid = GridVisualizer(x_range, y_range)
+
+    def plot_fn(self, fn, x_range, y_range):
         glColor3f(*self.color)
-        # plot a grid of line
-        # make sure to scale based on window size
-        glLineWidth(self.line_thickness)
-        glBegin(GL_LINES)
-        for i in range(-self.num_rows, self.num_rows + 1):
-            glVertex2f(-self.num_cols, i / self.num_rows)
-            glVertex2f(self.num_cols, i / self.num_rows)
-        for i in range(-self.num_cols, self.num_cols + 1):
-            glVertex2f(i / self.num_cols, -self.num_rows)
-            glVertex2f(i / self.num_cols, self.num_rows)
+        glBegin(GL_LINE_STRIP)
+        for seg in range(self.segments):
+            x = x_range[0] + seg * (x_range[1] - x_range[0]) / self.segments
+            y = fn(x)
+            normalized_x = (x - x_range[0]) / (x_range[1] - x_range[0])
+            normalized_y = (y - y_range[0]) / (y_range[1] - y_range[0])
+            glVertex2f(2*normalized_x - 1, 2*normalized_y - 1)
         glEnd()
     
-    def plot_axis(self):
-        glColor3f(*self.axis_color)
-        glLineWidth(self.line_thickness)
-        glBegin(GL_LINES)
-        glVertex2f(-self.num_cols, 0)
-        glVertex2f(self.num_cols, 0)
-        glVertex2f(0, -self.num_rows)
-        glVertex2f(0, self.num_rows)
-        glEnd()
+    def draw(self):
+        self.grid.draw()
+        self.plot_fn(self.fn, self.x_range, self.y_range)
+    
+
+    
+
+
+        
+

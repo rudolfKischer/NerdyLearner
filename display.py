@@ -1,8 +1,9 @@
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from plotter import LinePlot, PointPlot, GridVisualizer
-
+from plotter import LinePlot, PointPlot, FunctionPlotter
+from math_functions import getSinWaveFn
+import numpy as np
 
 
 
@@ -112,10 +113,10 @@ if __name__ == "__main__":
 
     display = Display()
     pointPlot = PointPlot()
-    grid = GridVisualizer()
+    functionPlot = FunctionPlotter(getSinWaveFn(frequency=1, amplitude=1, phase=0), (-1, 1), (-1, 1))
     
-    display.add_draw_func(grid.plot_grid)
-    display.add_draw_func(grid.plot_axis)
+
+    display.add_draw_func(functionPlot.draw)
     display.add_draw_func(pointPlot.plot_point)
 
     display.add_mouse_callback(pointPlot.mouse_callback)
