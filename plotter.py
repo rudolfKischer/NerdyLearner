@@ -78,15 +78,47 @@ class FunctionPlotter():
         self.segments = segments
         self.color = color
         self.grid = GridVisualizer(x_range, y_range)
-        self.pointPlot = PointPlot([], color=self.color, point_size=0.01, line_width=1, connect=True, show_points=False)
+        self.pointPlot = PointPlot([], color=self.color, point_size=0.01, line_width=1, connect=True, show_points=True)
 
     
+    def compute_slope_changes(self, x_points, y_values):
+        slopes = np.diff(y_values) / np.diff(x_points)
+        return np.abs(np.diff(slopes))
+
+    def identify_indices(self, slope_changes):
+        # Sort segments based on slope changes
+        sorted_indices = np.argsort(slope_changes)
+        
+        # Half of the segments to modify will be from the smallest slope changes
+        remove_indices = sorted_indices[:self.segments//20]  # example: 5% of total segments
+        
+        # The other half will be from the largest slope changes
+        add_indices = sorted_indices[-self.segments//20:]
+        
+        return add_indices, remove_indices
+
+    def reallocate_points(self, x_points, add_indices, remove_indices):
+        for index in add_indices:
+            x_mid = 0.5 * (x_points[index] + x_points[index + 1])
+            x_points = np.insert(x_points, index + 1, x_mid)
+        
+        for index in reversed(remove_indices):
+            x_points = np.delete(x_points, index + 1)
+
+        return x_points
+
+    def adapt_points(self, x_range):
+        x_points = np.linspace(x_range[0], x_range[1], self.segments)
+        y_values = np.array([self.fn(x) for x in x_points])
+        
+        slope_changes = self.compute_slope_changes(x_points, y_values)
+        add_indices, remove_indices = self.identify_indices(slope_changes)
+        
+        return self.reallocate_points(x_points, add_indices, remove_indices)
+
     def get_seg_points(self, x_range):
-        seg_points = []
-        for seg in range(self.segments):
-            x = x_range[0] + seg * (x_range[1] - x_range[0]) / self.segments
-            y = self.fn(x)
-            seg_points.append((x, y))
+        x_points = self.adapt_points(x_range)
+        seg_points = [(x, self.fn(x)) for x in x_points]
         return seg_points
 
     def plot_fn(self):
