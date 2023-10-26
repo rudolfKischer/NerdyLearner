@@ -74,6 +74,7 @@ class TextBitmap:
         
 
         # get glfw aspect ratio
+        glColor4f(*self.text_color)
         glBegin(GL_QUADS)
         glTexCoord2f(0, 1); glVertex2f(*bottom_left)
         glTexCoord2f(1, 1); glVertex2f(top_right[0], bottom_left[1])

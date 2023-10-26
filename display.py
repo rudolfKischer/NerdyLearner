@@ -117,7 +117,7 @@ if __name__ == "__main__":
     
 
     display.add_draw_func(functionPlot.draw)
-    display.add_draw_func(pointPlot.plot_point)
+    display.add_draw_func(pointPlot.draw)
 
     display.add_mouse_callback(pointPlot.mouse_callback)
     display.render()

@@ -2,6 +2,8 @@ import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from grid_visualizer import GridVisualizer
+import numpy as np
+from display_primitives import draw_point, draw_line, draw_pointRound
 
 class LinePlot():
 
@@ -18,18 +20,39 @@ class LinePlot():
 
 class PointPlot():
 
-    def __init__(self):
-        self.points = []
+    def __init__(self, 
+                 points = None, 
+                 color=(1.0, 0.0, 0.0), 
+                 point_size=0.02,
+                 line_width=1, 
+                 connect=True):
+        self.points = points
+        if self.points is None:
+            self.points = []
+        self.color = color
+        self.point_size = point_size
+        self.connect = connect
+        self.line_width = line_width
     
     def add_point(self, x, y):
         self.points.append((x, y))
+    
+    def clear_points(self):
+        self.points = []
+    
+    def set_points(self, points):
+        self.clear_points()
+        for point in points:
+            self.add_point(*point)
+    
+    def draw(self):
+        for point in self.points:
+            draw_pointRound(point, self.color, self.point_size)
+        
+        if self.connect:
+            for i in range(len(self.points) - 1):
+                    draw_line(self.points[i], self.points[i+1], self.color, self.line_width)
 
-    def plot_point(self):
-        glBegin(GL_LINE_STRIP)
-        glColor3f(1.0, 1.0, 1.0)
-        for x, y in self.points:
-            glVertex2f(x, y)
-        glEnd()
 
     def mouse_callback(self, window, button, action, mods):
         if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
@@ -52,17 +75,21 @@ class FunctionPlotter():
         self.segments = segments
         self.color = color
         self.grid = GridVisualizer(x_range, y_range)
+        self.pointPlot = PointPlot([], color, 0.01, True)
 
-    def plot_fn(self, fn, x_range, y_range):
-        glColor3f(*self.color)
-        glBegin(GL_LINE_STRIP)
+    
+    def get_seg_points(self, x_range, y_range):
+        seg_points = []
         for seg in range(self.segments):
             x = x_range[0] + seg * (x_range[1] - x_range[0]) / self.segments
-            y = fn(x)
-            normalized_x = (x - x_range[0]) / (x_range[1] - x_range[0])
-            normalized_y = (y - y_range[0]) / (y_range[1] - y_range[0])
-            glVertex2f(2*normalized_x - 1, 2*normalized_y - 1)
-        glEnd()
+            y = self.fn(x)
+            seg_points.append((x, y))
+        return seg_points
+
+    def plot_fn(self, fn, x_range, y_range):
+        seg_points = self.get_seg_points(x_range, y_range)
+        self.pointPlot.set_points(seg_points)
+        self.pointPlot.draw()
     
     def draw(self):
         self.grid.draw()
