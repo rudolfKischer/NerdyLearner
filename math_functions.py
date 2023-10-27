@@ -9,6 +9,11 @@ def getSinWaveFn(frequency=1, amplitude=1, phase=0):
   def fn(x):
     return amplitude * np.sin( 2 * np.pi * frequency * x + phase)
   return fn
+
+def getLinearFn(m=1, b=0):
+  def fn(x):
+    return m * x + b
+  return fn
   
 
 def uniform_random_sample(fn, interval, n):

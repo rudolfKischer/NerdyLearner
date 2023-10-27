@@ -1,9 +1,6 @@
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from plotter import LinePlot, PointPlot, FunctionPlotter
-from math_functions import getSinWaveFn, uniform_random_sample
-import numpy as np
 
 
 
@@ -109,22 +106,3 @@ class Display:
             glfw.poll_events()
             self.update()
         glfw.terminate()
-
-if __name__ == "__main__":
-
-    display = Display()
-    pointPlot = PointPlot()
-    sin_func = getSinWaveFn(frequency=1, amplitude=1, phase=0)
-    functionPlot = FunctionPlotter(sin_func, (-1, 1), (-1, 1))
-    
-
-    display.add_draw_func(functionPlot.draw)
-    display.add_draw_func(pointPlot.draw)
-
-    #uniform random sample
-    points = uniform_random_sample(sin_func, (-1, 1), 100)
-    samplePointPlot = PointPlot(points, color=(0.0, 1.0, 0.0), point_size=0.01, line_width=1, connect=False)
-    display.add_draw_func(samplePointPlot.draw)
-
-    display.add_mouse_callback(pointPlot.mouse_callback)
-    display.render()
