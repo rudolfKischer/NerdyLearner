@@ -54,16 +54,18 @@ class InputWindow(NerdyWindow):
         super().setup()
         self.listeners = {
             "mouse": [],
+            "mouse_move": [],
             "key": []
         }
         glfw.set_mouse_button_callback(self.glfw_window, self.mouse_callback)
+        glfw.set_cursor_pos_callback(self.glfw_window, self.mouse_move_callback)
         glfw.set_key_callback(self.glfw_window, self.key_callback)
     
-    def add_mouse_listener(self, listener):
-        self.listeners["mouse"].append(listener)
-    
-    def add_key_listener(self, listener):
-        self.listeners["key"].append(listener)
+    def add_listener(self, listener, event_type):
+        if event_type not in self.listeners:
+            raise Exception(f"Invalid event type: {event_type}")
+        self.listeners[event_type].append(listener)
+
 
     def key_callback(self, window, key, scancode, action, mods):
         for listener in self.listeners["key"]:
@@ -72,6 +74,10 @@ class InputWindow(NerdyWindow):
     def mouse_callback(self, window, button, action, mods):
         for listener in self.listeners["mouse"]:
             listener(window, button, action, mods)
+    
+    def mouse_move_callback(self, window, x, y):
+        for listener in self.listeners["mouse_move"]:
+            listener(window, x, y)
 
 class Display:
     
@@ -89,17 +95,15 @@ class Display:
             func()
         glfw.swap_buffers(self.glfw_window)
     
-    def add_mouse_callback(self, callback):
-        self.window.add_mouse_listener(callback)
-    
-    def add_key_callback(self, callback):
-        self.window.add_key_listener(callback)
+    def add_callback(self, callback, event_type):
+        """
+        event_type: "key", "mouse", "mouse_move"
+        """
+        self.window.add_listener(callback, event_type)
     
     def add_draw_func(self, func):
         self.draw_funcs.append(func)
-    
-    def put_draw_func(self, func, i):
-        self.draw_funcs.insert(i, func)
+
     
     def render(self):
         while not glfw.window_should_close(self.glfw_window):

@@ -77,7 +77,7 @@ class FunctionPlotter():
             self.y_range = (-10, 10)
         self.segments = segments
         self.color = color
-        self.grid = GridVisualizer(x_range, y_range)
+        self.grid = GridVisualizer(x_range, y_range, 0.1, 0.1)
         self.pointPlot = PointPlot([], color=self.color, point_size=0.01, line_width=1, connect=True, show_points=False)
 
     

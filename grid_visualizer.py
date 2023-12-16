@@ -64,6 +64,11 @@ class GridVisualizer():
         for val in self.grid_values(self.y_range, self.y_step):
             self.draw_gridlines(val, self.y_step, False)
 
+red = (1.0, 0.0, 0.0)
+blue = (0.0, 0.0, 1.0)
+maroon = (0.502, 0.122, 0.192)
+seafoam = (0.09, 0.639, 0.427)
+
 class GridMeshVisualizer():
     # Divides a range into a grid of cells, and draws a mesh over the grid
     # each cell is a square that can have its own color
@@ -76,7 +81,15 @@ class GridMeshVisualizer():
                  x_range=(-10, 10), 
                  y_range=(-10, 10), 
                  x_step=None, y_step=None, 
-                 color=(0.3, 0.3, 0.4)):
+                 color=(0.3, 0.3, 0.4),
+                 color_1 = seafoam,
+                 color_2 = maroon,
+                 color_3 = (1.0, 1.0, 1.0)
+                 ):
+        
+        self.color_1 = color_1
+        self.color_2 = color_2
+        self.color_3 = color_3
         self.color = color
         self.axis_color = (1.0, 1.0, 1.0)
         self.x_range, self.y_range = x_range, y_range
@@ -95,7 +108,7 @@ class GridMeshVisualizer():
     def draw_quad_node_outline(self, quad):
         # draw outline
         if quad.children[0] is None:
-            draw_quad_frame(quad.position, quad.dimension, (0, 0, 0), width=4)
+            draw_quad_frame(quad.position, quad.dimension, (0.5, 0.5, 0.5), width=2)
         
         for child in quad.children:
             if child is not None:
@@ -117,13 +130,10 @@ class GridMeshVisualizer():
         # if the quad has no children, draw it
         # if the quads data_value is not none, draw it
         # if the data value is True, draw red, if it is false, draw blue
-        red = (1.0, 0.0, 0.0)
-        blue = (0.0, 0.0, 1.0)
-        white = (1.0, 1.0, 1.0)
         class_color_map = {
-            True: red,
-            False: blue,
-            None: white
+            True: self.color_1,
+            False: self.color_2,
+            None: self.color_3
         }
 
         if quad.children[0] is None:

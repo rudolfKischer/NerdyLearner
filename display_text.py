@@ -24,6 +24,8 @@ class TextBitmap:
             if key not in self.default_params:
                 raise Exception(f"Invalid parameter: {key}")
             setattr(self, key, value)
+        
+        self.create_text_img()
     
 
     def create_text_img(self):
@@ -48,7 +50,7 @@ class TextBitmap:
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
 
         return texture_id
-        
+            
     def draw(self, x, y, scale = (1.0, 1.0)):
         if self.texture_id is None:
             self.texture_id = self.create_text_texture()
@@ -61,12 +63,12 @@ class TextBitmap:
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
 
         glPushMatrix()
-        glTranslatef(x, y, 0)
 
         bottom_left = (0, 0)
         top_right = (self.text_width, self.text_height)
         # normalize so that the hieght always equals 1
         # scale x accordingly
+        glTranslatef(x, y, 0)
         normal_factor = 1.0 / self.text_height
         scale_x = normal_factor * scale[0]
         scale_y = normal_factor * scale[1]
