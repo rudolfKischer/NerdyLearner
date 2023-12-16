@@ -29,7 +29,7 @@ class GridVisualizer():
 
     def draw_text(self, val, is_x_axis):
         if is_x_axis:
-            x_pos = self.rel_pos(val, self.x_range)
+            x_pos = self.rel_pos(val, self.x_range) 
             y_pos = self.rel_pos(0, self.y_range)
         else:
             x_pos = self.rel_pos(0, self.x_range)

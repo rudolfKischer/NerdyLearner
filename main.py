@@ -6,6 +6,9 @@ from math_functions import getSinWaveFn, getLinearFn, uniform_random_sample
 from grid_visualizer import GridMeshVisualizer
 from gui_elements import Slider, GuiElement, QuadGuiElement
 import random
+from tex_tools import draw_texture
+import numpy as np
+from functools import lru_cache
 
 if __name__ == "__main__":
 
@@ -38,6 +41,8 @@ if __name__ == "__main__":
         return False
 
     slider = Slider()
+
+
     def sin_func(x):
         return (sin_func_1(x) + sin_func_2(x) + sin_func_3(x)) * slider.value
     lin_func = getLinearFn(-2, 1)
@@ -54,15 +59,54 @@ if __name__ == "__main__":
             gridMesh.insert(point, False)
         gridMesh.draw()
 
-    display.add_draw_func(gridMeshCallback)
+    maroon = (0.502, 0.122, 0.192)
+    seafoam = (0.09, 0.639, 0.427)  
+    
+    def drawClassifier(resolution=(100, 100)):
+        
+        #resolution
+        width, height = 150, 150
+        classifications = np.zeros((width, height, 3), dtype=np.float32)
+        #texture coords
+        tex_coords = np.array([(-1.0, -1.0), (-1.0, 1.0), (1.0, 1.0), (1, -1.0)], dtype=np.float32)
+
+        tex_width = tex_coords[2][0] - tex_coords[0][0]
+        tex_height = tex_coords[1][1] - tex_coords[0][1]
+
+        color_1 = seafoam
+        color_2 = maroon
+
+        # use the position in the array relative to  the texture coords to get the coordinates
+        for x in range(width):
+            x_coord = x / width
+            x_pos = tex_coords[0][0] + x_coord * tex_width
+            threshold_val = sin_func(x_pos)
+            for y in range(height):
+
+                y_coord = y / height
+                y_pos = tex_coords[0][1] + y_coord * tex_height
+                # make position relative to the texture coords
+                classifications[y][x] = color_1 if y_pos < threshold_val else color_2
+        
+        draw_texture(classifications, tex_coords)
+
+
     
 
-    display.add_draw_func(functionPlot.draw)
+    display.add_draw_func(drawClassifier)
+    # display.add_draw_func(gridMeshCallback)
+    
+
+    # display.add_draw_func(functionPlot.draw)
 
     display.add_draw_func(slider.draw)
     display.add_callback(slider.mouse_callback, "mouse")
     display.add_callback(slider.mouse_move_callback, "mouse_move")
     # display.add_draw_func(pointPlot.draw)
+
+    # add noise texture
+
+
 
     # test quad
     # quad = QuadGuiElement()
