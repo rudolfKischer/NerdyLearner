@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from math_functions import get_corners
 
 def draw_point(point, color=(1.0, 0.0, 0.0), size=5):
     glColor3f(*color)
@@ -27,13 +28,19 @@ def draw_line(start, end, color=(1.0, 0.0, 0.0), width=1):
 
 def draw_quad(position, dimension, color=(1.0, 0.0, 0.0), width=1):
     # quad should be filled in with color
+    points = get_corners(position, dimension)
+    draw_quad_p(points, color, width)
+    
+
+def draw_quad_p(points, color=(1.0, 0.0, 0.0), width=1):
+    # quad should be filled in with color
     glColor3f(*color)
     glLineWidth(width)
     glBegin(GL_QUADS)
-    glVertex2f(*position)
-    glVertex2f(position[0], position[1] + dimension[1])
-    glVertex2f(position[0] + dimension[0], position[1] + dimension[1])
-    glVertex2f(position[0] + dimension[0], position[1])
+    glVertex2f(*points[0])
+    glVertex2f(*points[1])
+    glVertex2f(*points[2])
+    glVertex2f(*points[3])
     glEnd()
 
 def draw_quad_frame(position, dimension, color=(1.0, 0.0, 0.0), width=1):
